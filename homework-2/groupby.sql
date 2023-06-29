@@ -5,14 +5,15 @@ FROM orders
 WHERE ship_city LIKE '%burg';
 
 -- 2. из таблицы orders идентификатор заказа, идентификатор заказчика, вес и страну отгрузки. Заказ отгружен в страны, начинающиеся на 'P'. Результат отсортирован по весу (по убыванию). Вывести первые 10 записей.
-SELECT order_id, customer_id, weight, ship_country
+SELECT order_id, customer_id, freight, ship_country
 FROM orders
 WHERE ship_country LIKE 'P%'
-ORDER BY weight DESC
+ORDER BY freight DESC
 LIMIT 10;
 
 -- 3. фамилию и телефон сотрудников, у которых в данных отсутствует регион (см таблицу employees)SELECT last_name, employees.photo FROM employees
-SELECT last_name, employees.photo FROM employees
+SELECT first_name, last_name, home_phone
+FROM employees
 WHERE region IS NULL;
 
 -- 4. количество поставщиков (suppliers) в каждой из стран. Результат отсортировать по убыванию количества поставщиков в стране
@@ -32,16 +33,28 @@ ORDER BY total_weight DESC;
 -- 6. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers) и работники (employees).
 SELECT country
 FROM customers
-UNION
+INTERSECT
 SELECT country
 FROM suppliers
-UNION
+INTERSECT
 SELECT country
-FROM employees;
-
--- 7. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers), но не зарегистрированы работники (employees).
+FROM employees
+EXCEPT
 SELECT country
 FROM customers
-INNER JOIN suppliers ON customers.country = suppliers.country
-LEFT JOIN employees ON customers.country = employees.country
-WHERE employees.country IS NULL;
+WHERE country NOT IN ('UK', 'USA')
+EXCEPT
+SELECT country
+FROM suppliers
+WHERE country NOT IN ('UK', 'USA')
+EXCEPT
+SELECT country
+FROM employees
+WHERE country NOT IN ('UK', 'USA');
+
+-- 7. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers), но не зарегистрированы работники (employees).
+SELECT country FROM customers
+INTERSECT
+SELECT country FROM suppliers
+EXCEPT
+SELECT country FROM employees;
