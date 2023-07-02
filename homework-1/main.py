@@ -4,7 +4,7 @@ from pathlib import Path
 import psycopg2
 
 
-# Подключение к базе данных
+# Подключение к базе данных.
 conn = psycopg2.connect(
     host="localhost",
     database="north",
